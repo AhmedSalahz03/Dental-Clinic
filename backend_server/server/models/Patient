@@ -1,0 +1,64 @@
+// models/Patient.js
+const mongoose = require('mongoose');
+
+const patientSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
+  },
+
+  profilePic: {
+    type: String,
+    default: ''
+  },
+
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other'],
+    required: true
+  },
+
+  dateOfBirth: {
+    type: Date,
+    required: true
+  },
+
+  address: {
+    country: String,
+    city: String,
+    zip: String,
+    street: String
+  },
+
+  phone: {
+    type: String,
+    unique: true
+  },
+
+  // Medical history
+  medicalHistory: {
+    allergies: [String],
+    medications: [String],
+    conditions: [String], // e.g., diabetes, asthma
+    notes: String
+  },
+
+  // Dental chart (simplified)
+  dentalChart: {
+    teeth: {
+      type: Map,
+      of: new mongoose.Schema({
+        condition: String, 
+        notes: String
+      }, { _id: false })
+    }
+  },
+
+  createdAt: { type: Date, default: Date.now }
+});
+
+module.exports = mongoose.model('Patient', patientSchema);
