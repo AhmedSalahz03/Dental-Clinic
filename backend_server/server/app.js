@@ -1,3 +1,6 @@
+// Admin routes
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
 const express = require('express');
 const app = express();
 
