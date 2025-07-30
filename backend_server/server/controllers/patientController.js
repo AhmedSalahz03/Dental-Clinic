@@ -45,7 +45,7 @@ const updatePatient = async (req, res) => {
   }
 }
 
-const deletPatient = async (req, res) => {
+const deletePatient = async (req, res) => {
   const { id } = req.params;
   try {
     const patient = await Patient.findByIdAndDelete(id);
@@ -62,5 +62,6 @@ module.exports = {
   getAllPatients,
   addPatient,
   getPatientById,
-  updatePatient
+  updatePatient,
+  deletePatient
 };
