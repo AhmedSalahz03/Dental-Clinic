@@ -2,7 +2,7 @@ const AdminUser = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 
 // Admin signup
-exports.signup = async (req, res) => {
+const signup = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
     const existingUser = await AdminUser.findOne({ $or: [{ email }, { username }] });
@@ -18,7 +18,7 @@ exports.signup = async (req, res) => {
 };
 
 // Admin login
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await AdminUser.findOne({ email });
@@ -38,4 +38,9 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error logging in', error });
   }
+};
+
+module.exports = {
+  signup,
+  login
 };
