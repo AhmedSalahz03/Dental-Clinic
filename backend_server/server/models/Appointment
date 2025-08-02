@@ -1,11 +1,11 @@
-const mongoose = require('moongose');
+const mongoose = require('mongoose');
 
-const appointmentSchema = new moongose.Schema({
+const appointmentSchema = new mongoose.Schema({
 
   date: {type: Date, required: true },
 
   patient: {
-    type: moongose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Patient',
     required: true,  
   },
@@ -31,4 +31,4 @@ const appointmentSchema = new moongose.Schema({
   }
 });
 
-module.exports = moongose.model('Appointment', appointmentSchema );
+module.exports = mongoose.model('Appointment', appointmentSchema );

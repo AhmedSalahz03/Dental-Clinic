@@ -269,17 +269,45 @@ const samplePatients = [
     
 ];
 
+const Appointment = require('./models/Appointment');
+const Payment = require('./models/Payment');
+
 async function seed() {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
+
+    // Clear old data
     await Patient.deleteMany({});
-    await Patient.insertMany(samplePatients);
+    await Appointment.deleteMany({});
+    await Payment.deleteMany({});
+
+    // Insert patients
+    const insertedPatients = await Patient.insertMany(samplePatients);
     console.log('Sample patients inserted!');
+
+    // Use patient _ids for related appointments and payments
+    const appointments = insertedPatients.map((patient, index) => ({
+      date: new Date(Date.now() + index * 86400000), // Spread out by 1 day
+      status: index % 2 === 0 ? 'scheduled' : 'completed',
+      patient: patient._id,
+    }));
+
+    const payments = insertedPatients.map((patient, index) => ({
+      amount: 200 + index * 50,
+      status: index % 2 === 0 ? 'paid' : 'unpaid',
+      patient: patient._id,
+    }));
+
+    await Appointment.insertMany(appointments);
+    await Payment.insertMany(payments);
+    console.log('Appointments and payments inserted!');
+
     process.exit();
   } catch (err) {
     console.error(err);
     process.exit(1);
   }
 }
+
 
 seed();
