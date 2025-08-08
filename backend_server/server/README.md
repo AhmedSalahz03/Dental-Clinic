@@ -1,54 +1,83 @@
-# Patient Module – Dental Office Backend
+# Authentication Module – Dental Office Backend
 
-## Entity Chosen: Patient
-The Patient entity was chosen because it is central to any dental clinic management system. It stores all relevant patient information, medical history, and dental chart data, which are essential for clinic operations and future extensions (appointments, treatments, billing, etc).
+## What This Module Does
+This module provides authentication for the Dental Office backend. It allows admins to sign up and log in securely, using hashed passwords and JWT tokens. Protected routes are available for authenticated users only.
+
+## User Roles
+- **Admin**
 
 ## Model Fields
-The Patient model includes:
-- `name`: Patient's full name
-- `email`: Unique email address
-- `profilePic`: Profile picture URL
-- `gender`: Gender (male, female, other)
-- `dateOfBirth`: Date of birth
-- `address`: Country, city, zip, street
-- `phone`: Unique phone number
-- `medicalHistory`: Allergies, medications, conditions, notes
-- `dentalChart`: Map of teeth with condition and notes
-- `createdAt`: Date of record creation
+The Admin model includes:
+- `username`: Unique username
+- `password`: Hashed password
+- `role`: User role (e.g., admin, dentist)
 
-## Routes Summary
-All routes are prefixed with `/api/patients`:
+## Routes List & Examples
 
-| Method | Endpoint              | Description                |
-|--------|-----------------------|----------------------------|
-| POST   | `/api/patients`       | Create a new patient       |
-| GET    | `/api/patients`       | Get all patients           |
-| GET    | `/api/patients/:id`   | Get patient by ID          |
-| PATCH  | `/api/patients/:id`   | Update patient by ID       |
-| DELETE | `/api/patients/:id`   | Delete patient by ID       |
+| Method | Endpoint              | Description                       |
+|--------|-----------------------|-----------------------------------|
+| POST   | `/api/admin/signup`   | Register a new admin, returns JWT |
+| POST   | `/api/admin/login`    | Login, returns JWT                |
+| GET    | `/api/appointments`   | Example protected route           |
+
+### Example Signup Request
+```json
+{
+  "username": "ahmedsalah",
+  "password": "somepassword",
+  "secret": "theactualsecret",
+  "role": "dentist"
+}
+```
+
+### Example Login Request
+```json
+{
+  "username": "ahmedsalah",
+  "password": "somepassword"
+}
+```
+
+### Using the Token
+- After signup/login, copy the returned token.
+- For protected routes, add this header in Postman:
+  ```
+  Authorization: Bearer <your_token_here>
+  ```
 
 ## How to Run Locally
+
 1. Clone the repository.
 2. Install dependencies:
    ```
    npm install
    ```
-3. Set up your `.env` file with your MongoDB URI:
+3. Set up your `.env` file with these three required values:
    ```
+   PORT=5000
    MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   SIGNUP_SECRET_CODE=theactualsecret
    ```
+
+**.env Value Explanations:**
+- `PORT`: The port your server will run on (default is 5000).
+- `MONGODB_URI`: Your MongoDB connection string.
+- `JWT_SECRET`: Used to sign and verify JWT tokens for authentication.
+- `SIGNUP_SECRET_CODE`: A private code required for admin signup. This ensures only authorized staff (not the public) can create admin accounts on the system. This code will only be shared with clinic staff.
+
 4. Start the server:
    ```
    npm run dev
    ```
-5. Use Postman to test the endpoints above. Example requests and responses are available in the repo screenshots folder.
+5. Use Postman to test the endpoints above.
 
 ## Notes
-- Built with Node.js, Express, and Mongoose.
-- All controllers use async/await and proper error handling.
-- Express JSON middleware is enabled.
-- This module is ready for future extension (users, authentication, role-based access, etc).
+- Passwords are hashed with bcryptjs.
+- JWT tokens are used for authentication.
+- Modular code structure (models, controllers, routes, middleware).
+- Ready for future extension (user photos, role-based access, etc).
 
 ---
-**Author:** Ahmed Salah
+**Author:** Ahmed Salah  
 **Project:** Dental Office Backend
