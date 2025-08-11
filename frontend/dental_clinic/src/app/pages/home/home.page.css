@@ -1,0 +1,46 @@
+.page {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  align-items: flex-start; /* prevent equal-height stretch */
+}
+
+/* Left sidebar: fixed height + scroll */
+.sidebar {
+  width: 320px;
+  max-width: 35vw;
+  min-width: 280px;
+  height: 72vh;          /* fixed height; adjust as needed */
+  overflow-y: auto;      /* makes it scrollable */
+  border-right: 1px solid #e0e7ff;
+  background: #f8fbff;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* Right content fills remaining space */
+.content {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #eef2ff;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 72vh;      /* optional: match sidebar height */
+  overflow: auto;        /* optional: scroll if content is long */
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 768px) {
+  .page {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    height: 50vh;        /* fixed but shorter on mobile */
+  }
+  .content {
+    min-height: 50vh;
+  }
+}

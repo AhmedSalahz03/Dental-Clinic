@@ -1,0 +1,63 @@
+/* Blue and White Theme for Patients List Component */
+
+:host {
+    display: block;
+    background-color: #f5faff;
+    color: #1a237e;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(26, 35, 126, 0.08);
+}
+
+.header {
+    background-color: #1976d2;
+    color: #fff;
+    padding: 16px;
+    border-radius: 8px 8px 0 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.patients-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+.patients-table th,
+.patients-table td {
+    padding: 12px 16px;
+    text-align: left;
+}
+
+.patients-table th {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.patients-table tr:nth-child(even) {
+    background-color: #f5faff;
+}
+
+.patients-table tr:hover {
+    background-color: #bbdefb;
+}
+
+.action-btn {
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #1565c0;
+}

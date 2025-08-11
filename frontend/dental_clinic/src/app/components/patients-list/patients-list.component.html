@@ -1,0 +1,18 @@
+<div class="header">My Patients</div>
+
+<table class="patients-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let patient of patients">
+      <td>{{ patient.name }}</td>
+      <td>
+        <button class="action-btn">View</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
