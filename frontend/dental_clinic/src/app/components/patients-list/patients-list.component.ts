@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientService, Patient } from '../../services/patient.service';
 
@@ -12,11 +12,17 @@ import { PatientService, Patient } from '../../services/patient.service';
 export class PatientsListComponent implements OnInit {
 	patients: Patient[] = [];
 
+	@Output() selected = new EventEmitter<Patient>();
+
 	constructor(private patientService: PatientService) {}
 
 	ngOnInit() {
 		this.patientService.getPatients().subscribe(data => {
 			this.patients = data;
 		});
+	}
+
+	selectPatient(patient: Patient) {
+		this.selected.emit(patient); // or handle navigation here
 	}
 }

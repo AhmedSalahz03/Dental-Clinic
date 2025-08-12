@@ -48,6 +48,10 @@
     background-color: #bbdefb;
 }
 
+.patients-table tbody tr {
+  cursor: pointer;
+}
+
 .action-btn {
     background-color: #1976d2;
     color: #fff;

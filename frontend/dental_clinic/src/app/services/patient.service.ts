@@ -5,9 +5,6 @@ import { Observable } from 'rxjs';
 export interface Patient {
   _id: string;
   name: string;
-  email: string;
-  phone: string;
-  // Add other fields as needed
 }
 
 @Injectable({ providedIn: 'root' })
