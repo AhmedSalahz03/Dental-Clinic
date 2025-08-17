@@ -23,6 +23,6 @@ export class PatientsListComponent implements OnInit {
 	}
 
 	selectPatient(patient: Patient) {
-		this.selected.emit(patient); // or handle navigation here
+		this.selected.emit(patient);
 	}
 }
