@@ -15,10 +15,10 @@ const adminUserSchema = new mongoose.Schema({
     required: true
   },
 
-  role: {
-    type: String,
+  roles: {
+    type: [String],
     enum: ['admin', 'receptionist', 'dentist'],
-    default: 'admin'
+    default: ['admin']
   },
 
   createdAt: {

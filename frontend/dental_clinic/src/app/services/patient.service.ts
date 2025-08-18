@@ -8,7 +8,7 @@ export interface Patient {
   email: string;
   dateOfBirth: Date;
   phone: string;
-  address: string;
+  address: string | { country?: string; city?: string; zip?: string; street?: string };
   gender: string;
 
 }
@@ -25,5 +25,17 @@ export class PatientService {
 
   getPatientById(id: string): Observable<Patient> {
     return this.http.get<Patient>(`${this.apiUrl}/${id}`);
+  }
+
+  deletePatient(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  updatePatient(id: string, data: Partial<Patient>): Observable<Patient> {
+    return this.http.patch<Patient>(`${this.apiUrl}/${id}`, data);
+  }
+
+  createPatient(data: Partial<Patient>): Observable<Patient> {
+    return this.http.post<Patient>(this.apiUrl, data);
   }
 }

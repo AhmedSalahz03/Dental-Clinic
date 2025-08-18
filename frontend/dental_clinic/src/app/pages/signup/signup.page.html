@@ -1,6 +1,20 @@
 <form (ngSubmit)="signup()" autocomplete="off">
 	<input type="text" placeholder="Username" [(ngModel)]="username" name="username" required />
 	<input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
+	<input type="text" placeholder="Secret Code" [(ngModel)]="secret_code" name="secret_code" required />
+		<div class="roles-container">
+			<label>Select Role(s):</label>
+			<div class="roles-instructions">Choose one or more roles:</div>
+			<div class="roles-checkboxes">
+				<label *ngFor="let role of availableRoles" class="role-checkbox">
+					<input type="checkbox"
+						   [checked]="roles.includes(role.value)"
+						   (change)="onRoleChange(role.value, $event)"
+					/> {{ role.label }}
+				</label>
+			</div>
+			<div *ngIf="roles.length === 0 && submitted" class="error">Please select at least one role.</div>
+		</div>
 	<button type="submit">Sign Up</button>
 </form>
 <div *ngIf="error" class="error">{{ error }}</div>

@@ -12,11 +12,18 @@
   max-width: 35vw;
   min-width: 280px;
   height: 72vh;          /* fixed height; adjust as needed */
-  overflow-y: auto;      /* makes it scrollable */
+  overflow: hidden;      /* prevent outer scroll; inner list will scroll */
   border-right: 1px solid #e0e7ff;
   background: #f8fbff;
   border-radius: 8px;
   padding: 8px;
+}
+
+/* Let patients-list fill the sidebar and manage its own internal scroll */
+.sidebar app-patients-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0; /* allow inner scroll containers to size correctly */
 }
 
 /* Right content fills remaining space */

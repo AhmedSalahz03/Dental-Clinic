@@ -1,6 +1,6 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PatientService, Patient } from '../../services/patient.service';
+import { Patient } from '../../services/patient.service';
 
 @Component({
 	selector: 'app-patients-list',
@@ -9,20 +9,28 @@ import { PatientService, Patient } from '../../services/patient.service';
 	templateUrl: './patients-list.component.html',
 	styleUrls: ['./patients-list.component.css']
 })
-export class PatientsListComponent implements OnInit {
-	patients: Patient[] = [];
+export class PatientsListComponent implements OnInit, OnChanges {
+	@Input() patients: Patient[] = [];
 
-	@Output() selected = new EventEmitter<Patient>();
+		@Output() selected = new EventEmitter<Patient>();
+		@Output() addPatient = new EventEmitter<void>();
 
-	constructor(private patientService: PatientService) {}
+	constructor() {}
 
-	ngOnInit() {
-		this.patientService.getPatients().subscribe(data => {
-			this.patients = data;
-		});
-	}
+		ngOnInit() {}
 
-	selectPatient(patient: Patient) {
-		this.selected.emit(patient);
-	}
+		ngOnChanges(changes: SimpleChanges) {
+			if (changes['patients']) {
+				console.log('Patients list updated:', this.patients);
+			}
+		}
+
+			selectPatient(patient: Patient) {
+				console.log('Patient selected:', patient);
+				this.selected.emit(patient);
+			}
+
+			addPatientClicked() {
+				this.addPatient.emit();
+			}
 }

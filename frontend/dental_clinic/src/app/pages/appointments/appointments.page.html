@@ -1,0 +1,101 @@
+<app-header></app-header>
+<div class="container py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Appointments</h2>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary btn-sm" (click)="toggleAdd()">{{ adding ? 'Cancel' : 'Add Appointment' }}</button>
+      <button class="btn btn-outline-primary btn-sm" (click)="refresh()" [disabled]="loading">Refresh</button>
+    </div>
+  </div>
+
+  <div *ngIf="adding" class="card p-3 mb-3">
+    <h5 class="mb-3">New Appointment</h5>
+    <form (ngSubmit)="saveAppointment()">
+      <div class="row g-2">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Patient</label>
+          <select class="form-select" [(ngModel)]="newAppt.patient" name="patient" required>
+            <option value="" disabled selected>Select patient</option>
+            <option *ngFor="let p of patients" [value]="p._id">{{ p.name }} — {{ p.phone }}</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Date</label>
+          <input class="form-control" type="datetime-local" [(ngModel)]="newAppt.date" name="date" required />
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Reason</label>
+          <input class="form-control" [(ngModel)]="newAppt.reason" name="reason" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-success btn-sm" type="submit">Save</button>
+        <button class="btn btn-secondary btn-sm" type="button" (click)="toggleAdd()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">Loading appointments…</div>
+  <div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <div *ngIf="!appointments?.length" class="text-muted">No appointments found.</div>
+    <ul class="list-group" *ngIf="appointments?.length">
+      <li class="list-group-item" *ngFor="let a of appointments">
+        <!-- View mode -->
+        <div class="d-flex justify-content-between align-items-start" *ngIf="editingId !== a._id">
+          <div>
+            <div class="fw-semibold">{{ getPatientName(a.patient) }}</div>
+            <div class="text-muted small">{{ (a.dateTime || a.date || a.scheduledAt) | date:'medium' }}</div>
+            <div class="small" *ngIf="a.reason">Reason: {{ a.reason }}</div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-info text-dark" *ngIf="a.status">{{ a.status }}</span>
+            <button class="btn btn-sm btn-outline-secondary" (click)="startEdit(a)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteAppointment(a)" title="Delete">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M5.5 5.5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1h2.5a1 1 0 0 1 1 1M4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Edit mode -->
+        <div *ngIf="editingId === a._id">
+          <form (ngSubmit)="saveEdit()">
+            <div class="row g-2 align-items-end">
+              <div class="col-12 col-md-3">
+                <label class="form-label">Patient</label>
+                <select class="form-select" [(ngModel)]="editModel.patient" name="editPatient" required>
+                  <option value="" disabled>Select patient</option>
+                  <option *ngFor="let p of patients" [value]="p._id">{{ p.name }} — {{ p.phone }}</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label">Date</label>
+                <input class="form-control" type="datetime-local" [(ngModel)]="editModel.date" name="editDate" required />
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label">Status</label>
+                <select class="form-select" [(ngModel)]="editModel.status" name="editStatus">
+                  <option value="scheduled">scheduled</option>
+                  <option value="completed">completed</option>
+                  <option value="cancelled">cancelled</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label">Reason</label>
+                <input class="form-control" [(ngModel)]="editModel.reason" name="editReason" />
+              </div>
+            </div>
+            <div class="mt-2 d-flex gap-2">
+              <button class="btn btn-success btn-sm" type="submit">Save</button>
+              <button class="btn btn-secondary btn-sm" type="button" (click)="cancelEdit()">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
