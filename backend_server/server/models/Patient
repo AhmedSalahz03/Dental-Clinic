@@ -47,16 +47,8 @@ const patientSchema = new mongoose.Schema({
     notes: String
   },
 
-  // Dental chart (simplified)
-  dentalChart: {
-    teeth: {
-      type: Map,
-      of: new mongoose.Schema({
-        condition: String, 
-        notes: String
-      }, { _id: false })
-    }
-  },
+  // Dental chart (free-form object: { [toothId]: { O|M|D|B|L|rootL|rootR: Diagnosis } })
+  dentalChart: { type: mongoose.Schema.Types.Mixed, default: {} },
 
   createdAt: { type: Date, default: Date.now }
 });

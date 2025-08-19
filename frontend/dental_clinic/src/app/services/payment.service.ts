@@ -9,6 +9,7 @@ export interface Payment {
   status?: 'paid' | 'pending' | string;
   method?: string;
   date?: string | Date;
+  note?: string;
   [key: string]: any;
 }
 
@@ -20,5 +21,17 @@ export class PaymentService {
 
   getPayments(): Observable<Payment[]> {
     return this.http.get<Payment[]>(this.apiUrl);
+  }
+
+  addPayment(data: Partial<Payment>): Observable<Payment> {
+    return this.http.post<Payment>(this.apiUrl, data);
+  }
+
+  updatePayment(id: string, data: Partial<Payment>): Observable<Payment> {
+    return this.http.patch<Payment>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deletePayment(id: string): Observable<{ message?: string } & any> {
+    return this.http.delete<{ message?: string } & any>(`${this.apiUrl}/${id}`);
   }
 }

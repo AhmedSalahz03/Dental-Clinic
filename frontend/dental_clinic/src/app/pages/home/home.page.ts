@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, JsonPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { PatientsListComponent } from '../../components/patients-list/patients-list.component';
 import { PatientService, Patient } from '../../services/patient.service';
 import { AppointmentService, Appointment } from '../../services/appointment.service';
@@ -14,7 +15,7 @@ type NewPatientForm = Partial<Omit<Patient, 'address' | 'dateOfBirth'>> & { addr
 @Component({
 	selector: 'app-home',
 	standalone: true,
-					imports: [CommonModule, FormsModule, HeaderComponent, PatientsListComponent, JsonPipe, DatePipe],
+					imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, PatientsListComponent, JsonPipe, DatePipe],
 	templateUrl: './home.page.html',
 	styleUrls: ['./home.page.css']
 })

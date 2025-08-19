@@ -10,6 +10,7 @@ export interface Patient {
   phone: string;
   address: string | { country?: string; city?: string; zip?: string; street?: string };
   gender: string;
+  dentalChart?: any;
 
 }
 

@@ -1,0 +1,42 @@
+<div class="chart-toolbar">
+  <div class="palette">
+    <button *ngFor="let d of diagnoses" type="button" class="chip" [class.active]="selected === d.key" (click)="pick(d.key)">
+      <span class="swatch" [style.backgroundColor]="d.color"></span>{{ d.label }}
+    </button>
+    <button type="button" class="chip eraser" [class.active]="selected === 'none'" (click)="pick('none')">
+      <span class="swatch" style="background:#ffffff;border:1px solid #e5e7eb"></span>Clear
+    </button>
+  </div>
+</div>
+
+<div class="chart-wrap">
+  <svg class="chart-svg" [attr.viewBox]="'0 0 ' + (16*48) + ' ' + (2*90)" role="img" aria-label="Dental chart">
+    <g *ngFor="let toothId of teethTop; let i = index" [attr.transform]="'translate(' + (i*48) + ',0)'"><g class="tooth">
+      <rect x="6" y="6" width="36" height="36" rx="6" ry="6" class="tooth-box"></rect>
+      <rect x="18" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'O')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'O')"><title>{{ getTitle(toothId,'O') }}</title></rect>
+      <rect x="6" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'M')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'M')"><title>{{ getTitle(toothId,'M') }}</title></rect>
+      <rect x="30" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'D')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'D')"><title>{{ getTitle(toothId,'D') }}</title></rect>
+      <rect x="18" y="6" width="12" height="12" [attr.fill]="getFill(toothId,'B')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'B')"><title>{{ getTitle(toothId,'B') }}</title></rect>
+      <rect x="18" y="30" width="12" height="12" [attr.fill]="getFill(toothId,'L')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'L')"><title>{{ getTitle(toothId,'L') }}</title></rect>
+      <rect x="10" y="48" width="12" height="22" rx="3" [attr.fill]="getFill(toothId,'rootL')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'rootL')"><title>{{ getTitle(toothId,'rootL') }}</title></rect>
+      <rect x="26" y="48" width="12" height="22" rx="3" [attr.fill]="getFill(toothId,'rootR')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'rootR')"><title>{{ getTitle(toothId,'rootR') }}</title></rect>
+      <text x="24" y="80" text-anchor="middle" class="tooth-label">{{ toothId }}</text>
+    </g></g>
+
+    <g *ngFor="let toothId of teethBottom; let i = index" [attr.transform]="'translate(' + (i*48) + ',90)'"><g class="tooth">
+      <rect x="6" y="6" width="36" height="36" rx="6" ry="6" class="tooth-box"></rect>
+      <rect x="18" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'O')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'O')"><title>{{ getTitle(toothId,'O') }}</title></rect>
+      <rect x="6" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'M')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'M')"><title>{{ getTitle(toothId,'M') }}</title></rect>
+      <rect x="30" y="18" width="12" height="12" [attr.fill]="getFill(toothId,'D')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'D')"><title>{{ getTitle(toothId,'D') }}</title></rect>
+      <rect x="18" y="6" width="12" height="12" [attr.fill]="getFill(toothId,'B')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'B')"><title>{{ getTitle(toothId,'B') }}</title></rect>
+      <rect x="18" y="30" width="12" height="12" [attr.fill]="getFill(toothId,'L')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'L')"><title>{{ getTitle(toothId,'L') }}</title></rect>
+      <rect x="10" y="48" width="12" height="22" rx="3" [attr.fill]="getFill(toothId,'rootL')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'rootL')"><title>{{ getTitle(toothId,'rootL') }}</title></rect>
+      <rect x="26" y="48" width="12" height="22" rx="3" [attr.fill]="getFill(toothId,'rootR')" class="part" role="button" tabindex="0" (click)="togglePart(toothId,'rootR')"><title>{{ getTitle(toothId,'rootR') }}</title></rect>
+      <text x="24" y="80" text-anchor="middle" class="tooth-label">{{ toothId }}</text>
+    </g></g>
+  </svg>
+</div>
+
+<div class="chart-actions">
+  <button type="button" class="btn btn-sm btn-outline-secondary" (click)="chart = {}; chartChange.emit({});">Clear all</button>
+</div>

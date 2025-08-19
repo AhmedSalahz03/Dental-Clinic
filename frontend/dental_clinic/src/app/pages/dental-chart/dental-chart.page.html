@@ -1,0 +1,14 @@
+<app-header></app-header>
+<div class="container py-3">
+  <h2 class="mb-3">Dental Chart</h2>
+  <div *ngIf="loading" class="alert alert-info">Loading…</div>
+  <div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="!loading && !error && patient">
+    <div class="mb-2"><strong>Patient:</strong> {{ patient.name }} — {{ patient.phone }}</div>
+    <app-dental-chart [chart]="chartDraft" (chartChange)="onChartChange($event)"></app-dental-chart>
+    <div class="mt-3 d-flex gap-2">
+      <button class="btn btn-primary btn-sm" (click)="save()">Save</button>
+      <a class="btn btn-outline-secondary btn-sm" [routerLink]="['/']">Back</a>
+    </div>
+  </div>
+</div>
