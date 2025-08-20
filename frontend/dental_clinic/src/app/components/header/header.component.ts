@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -14,5 +16,12 @@ export class HeaderComponent {
 
   onHome() {
     this.homeClick.emit();
+  }
+
+  constructor(private auth: AuthService, private router: Router) {}
+
+  onLogout() {
+    this.auth.logout();
+    this.router.navigateByUrl('/welcome');
   }
 }

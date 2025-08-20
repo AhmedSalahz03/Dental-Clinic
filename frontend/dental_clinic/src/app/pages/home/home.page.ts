@@ -36,6 +36,12 @@ export class HomePage {
 	lastPayments: Payment[] = [];
 	newPatientForm: NewPatientForm = { address: { country: '', city: '', zip: '', street: '' } };
 
+	get todayDate(): string {
+		const now = new Date();
+		const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+		return local;
+	}
+
 	constructor(
 		private patientService: PatientService,
 		private appointmentService: AppointmentService,

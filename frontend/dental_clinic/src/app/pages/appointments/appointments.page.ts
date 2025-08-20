@@ -22,6 +22,13 @@ export class AppointmentsPage {
   editingId: string | null = null;
   editModel: { patient: string; date: string; reason?: string; status?: string } = { patient: '', date: '' };
 
+  get minDateTime(): string {
+    // current time in local datetime-local format
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    return local;
+  }
+
   constructor(private apptService: AppointmentService, private patientService: PatientService) {
     this.refresh();
     this.loadPatients();
@@ -70,6 +77,11 @@ export class AppointmentsPage {
       this.error = 'Patient ID and Date are required';
       return;
     }
+    // Prevent past date
+    if (new Date(this.newAppt.date).getTime() < Date.now() - 60 * 1000) {
+      this.error = 'Appointment date must be in the future';
+      return;
+    }
     this.error = '';
     this.apptService.addAppointment({
       patient: this.newAppt.patient,
@@ -107,6 +119,10 @@ export class AppointmentsPage {
     if (!this.editingId) return;
     if (!this.editModel.patient || !this.editModel.date) {
       this.error = 'Patient and Date are required';
+      return;
+    }
+    if (new Date(this.editModel.date).getTime() < Date.now() - 60 * 1000) {
+      this.error = 'Appointment date must be in the future';
       return;
     }
     const payload: Partial<Appointment> = {

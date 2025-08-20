@@ -1,21 +1,37 @@
-<form (ngSubmit)="signup()" autocomplete="off">
-	<input type="text" placeholder="Username" [(ngModel)]="username" name="username" required />
-	<input type="password" placeholder="Password" [(ngModel)]="password" name="password" required />
-	<input type="text" placeholder="Secret Code" [(ngModel)]="secret_code" name="secret_code" required />
+<form #signupForm="ngForm" (ngSubmit)="signup()" autocomplete="off" novalidate>
+	<input type="text" placeholder="Username" [(ngModel)]="username" name="username" required minlength="3" #su="ngModel" [class.is-invalid]="su.invalid && (su.dirty || su.touched)" />
+	<div class="invalid-feedback d-block" *ngIf="su.invalid && (su.dirty || su.touched)">
+		<span *ngIf="su.errors?.['required']">Username is required.</span>
+		<span *ngIf="su.errors?.['minlength']">Username must be at least 3 characters.</span>
+	</div>
+	<input type="password" placeholder="Password (min 8)" [(ngModel)]="password" name="password" required minlength="8" #sp="ngModel" [class.is-invalid]="sp.invalid && (sp.dirty || sp.touched)" />
+	<div class="invalid-feedback d-block" *ngIf="sp.invalid && (sp.dirty || sp.touched)">
+		<span *ngIf="sp.errors?.['required']">Password is required.</span>
+		<span *ngIf="sp.errors?.['minlength']">Password must be at least 8 characters.</span>
+	</div>
+	<input type="text" placeholder="Secret Code" [(ngModel)]="secret_code" name="secret_code" required minlength="8" #ss="ngModel" [class.is-invalid]="ss.invalid && (ss.dirty || ss.touched)" />
+	<div class="invalid-feedback d-block" *ngIf="ss.invalid && (ss.dirty || ss.touched)">
+		<span *ngIf="ss.errors?.['required']">Secret code is required.</span>
+		<span *ngIf="ss.errors?.['minlength']">Secret code must be at least 8 characters.</span>
+	</div>
 		<div class="roles-container">
-			<label>Select Role(s):</label>
-			<div class="roles-instructions">Choose one or more roles:</div>
+			<label>Select Role:</label>
+			<div class="roles-instructions">Choose one role:</div>
 			<div class="roles-checkboxes">
 				<label *ngFor="let role of availableRoles" class="role-checkbox">
-					<input type="checkbox"
-						   [checked]="roles.includes(role.value)"
-						   (change)="onRoleChange(role.value, $event)"
+					<input type="radio" name="selectedRole"
+					   [checked]="selectedRole === role.value"
+					   (change)="onRoleChange(role.value, $event)"
 					/> {{ role.label }}
 				</label>
 			</div>
-			<div *ngIf="roles.length === 0 && submitted" class="error">Please select at least one role.</div>
+			<div *ngIf="!selectedRole && submitted" class="invalid-feedback d-block">Please select a role.</div>
 		</div>
-	<button type="submit">Sign Up</button>
+	<button type="submit" [disabled]="signupForm.invalid || !selectedRole">Sign Up</button>
 </form>
 <div *ngIf="error" class="error">{{ error }}</div>
 <div *ngIf="success" class="success">{{ success }}</div>
+<div class="mt-3 text-center">
+	<span>Already have an account?</span>
+	<a routerLink="/login" class="btn btn-link p-0 align-baseline">Log in</a>
+</div>

@@ -21,7 +21,7 @@
         </div>
         <div class="col-12 col-md-4">
           <label class="form-label">Date</label>
-          <input class="form-control" type="datetime-local" [(ngModel)]="newAppt.date" name="date" required />
+          <input class="form-control" type="datetime-local" [(ngModel)]="newAppt.date" name="date" required [attr.min]="minDateTime" />
         </div>
         <div class="col-12 col-md-4">
           <label class="form-label">Reason</label>
@@ -74,7 +74,7 @@
               </div>
               <div class="col-12 col-md-3">
                 <label class="form-label">Date</label>
-                <input class="form-control" type="datetime-local" [(ngModel)]="editModel.date" name="editDate" required />
+                <input class="form-control" type="datetime-local" [(ngModel)]="editModel.date" name="editDate" required [attr.min]="minDateTime" />
               </div>
               <div class="col-12 col-md-3">
                 <label class="form-label">Status</label>
