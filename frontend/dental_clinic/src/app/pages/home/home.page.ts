@@ -29,6 +29,10 @@ export class HomePage {
 		address: { country: '', city: '', zip: '', street: '' }
 	};
 	addingPatient = false;
+	newPatientFile: File | null = null;
+	newPatientPreview: string | null = null;
+	editFile: File | null = null;
+	editPreview: string | null = null;
 
 	// Dashboard data
 	appointments: Appointment[] = [];
@@ -68,6 +72,10 @@ export class HomePage {
 		this.selectedPatient = null;
 		this.editingPatient = null;
 		this.addingPatient = false;
+			this.newPatientFile = null;
+			this.newPatientPreview = null;
+			this.editFile = null;
+			this.editPreview = null;
 		this.isHome = true;
 		this.loadDashboard();
 	}
@@ -140,6 +148,8 @@ export class HomePage {
 				this.editingPatient = null;
 				this.selectedPatient = null;
 				this.isHome = false;
+				this.newPatientFile = null;
+				this.newPatientPreview = null;
 					this.newPatientForm = {
 						name: '',
 						email: '',
@@ -164,19 +174,28 @@ export class HomePage {
 
 			saveNewPatient() {
 				const payload: any = { ...this.newPatientForm };
-				this.patientService
-					// @ts-ignore: allow extra fields
-					.createPatient(payload)
-					.subscribe((created: Patient) => {
+				if (this.newPatientFile) {
+					this.patientService.createPatientWithImage(payload, this.newPatientFile).subscribe((created: Patient) => {
 						this.addingPatient = false;
 						this.selectedPatient = created;
 						this.refreshPatients();
 					});
+				} else {
+					this.patientService
+						.createPatient(payload)
+						.subscribe((created: Patient) => {
+							this.addingPatient = false;
+							this.selectedPatient = created;
+							this.refreshPatients();
+						});
+				}
 			}
 
 			cancelAddPatient() {
 				this.addingPatient = false;
 				this.newPatientForm = { address: { country: '', city: '', zip: '', street: '' } } as NewPatientForm;
+				this.newPatientFile = null;
+				this.newPatientPreview = null;
 			}
 
 	saveEdit() {
@@ -188,7 +207,23 @@ export class HomePage {
 			console.warn('No editingPatient set, aborting save.');
 			return;
 		}
-		this.patientService.updatePatient(this.editingPatient._id, this.editForm).subscribe({
+		if (this.editFile) {
+			this.patientService.updatePatientWithImage(this.editingPatient._id, this.editForm, this.editFile).subscribe({
+				next: (updated) => {
+					console.log('Update success:', updated);
+					this.selectedPatient = updated;
+					this.editingPatient = null;
+					this.editFile = null;
+					this.editPreview = null;
+					this.refreshPatients();
+				},
+				error: (err) => {
+					console.error('Update failed:', err);
+					alert('Failed to save changes. Please check the console for details.');
+				}
+			});
+		} else {
+			this.patientService.updatePatient(this.editingPatient._id, this.editForm).subscribe({
 			next: (updated) => {
 				console.log('Update success:', updated);
 				this.selectedPatient = updated;
@@ -199,7 +234,8 @@ export class HomePage {
 				console.error('Update failed:', err);
 				alert('Failed to save changes. Please check the console for details.');
 			}
-		});
+			});
+		}
 	}
 
 	cancelEdit() {
@@ -213,5 +249,29 @@ export class HomePage {
 			this.editingPatient = null;
 			this.refreshPatients();
 		});
+	}
+
+	onNewProfilePicSelected(evt: Event) {
+		const input = evt.target as HTMLInputElement;
+		if (input.files && input.files[0]) {
+			this.newPatientFile = input.files[0];
+			const reader = new FileReader();
+			reader.onload = () => {
+				this.newPatientPreview = reader.result as string;
+			};
+			reader.readAsDataURL(this.newPatientFile);
+		}
+	}
+
+	onEditProfilePicSelected(evt: Event) {
+		const input = evt.target as HTMLInputElement;
+		if (input.files && input.files[0]) {
+			this.editFile = input.files[0];
+			const reader = new FileReader();
+			reader.onload = () => {
+				this.editPreview = reader.result as string;
+			};
+			reader.readAsDataURL(this.editFile);
+		}
 	}
 }

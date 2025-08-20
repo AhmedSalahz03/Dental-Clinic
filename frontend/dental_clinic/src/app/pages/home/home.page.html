@@ -116,6 +116,13 @@
             </div>
           </div>
           <div class="mb-2">
+            <label for="profilePic">Profile Picture:</label>
+            <input id="profilePic" class="form-control" type="file" accept="image/*" (change)="onNewProfilePicSelected($event)" />
+          </div>
+          <div class="mb-2" *ngIf="newPatientPreview">
+            <img [src]="newPatientPreview" alt="Preview" class="img-thumbnail" style="max-width: 120px; height: auto;" />
+          </div>
+          <div class="mb-2">
             <label for="sex">Gender:</label>
             <input id="sex" class="form-control" [(ngModel)]="newPatientForm.gender" name="sex" autocomplete="sex" placeholder="male/female" />
           </div>
@@ -173,6 +180,13 @@
             </div>
           </div>
           <div class="mb-2">
+            <label>Profile Picture:</label>
+            <input class="form-control" type="file" accept="image/*" (change)="onEditProfilePicSelected($event)" />
+          </div>
+          <div class="mb-2 d-flex align-items-center gap-3" *ngIf="selectedPatient?.profilePic || editPreview">
+            <img [src]="editPreview || selectedPatient?.profilePic" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
+          </div>
+          <div class="mb-2">
             <label>Gender:</label>
             <input class="form-control" [(ngModel)]="editForm.gender" name="gender" />
           </div>
@@ -183,6 +197,10 @@
         </form>
       </div>
       <div *ngIf="selectedPatient && !editingPatient" class="card p-3 mb-3">
+        <div class="mb-3 d-flex align-items-center gap-3" *ngIf="selectedPatient.profilePic">
+          <img [src]="selectedPatient.profilePic" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
+          <div class="fs-5 fw-semibold">{{ selectedPatient.name || 'N/A' }}</div>
+        </div>
         <div class="mb-2"><strong>Name:</strong> {{ selectedPatient.name || 'N/A' }}</div>
         <div class="mb-2"><strong>Email:</strong> {{ selectedPatient.email || 'N/A' }}</div>
         <div class="mb-2"><strong>Date of Birth:</strong> {{ selectedPatient.dateOfBirth ? (selectedPatient.dateOfBirth | date:'longDate') : 'N/A' }}</div>
@@ -194,9 +212,6 @@
           <button class="btn btn-danger btn-sm" (click)="deletePatient(selectedPatient)">Delete</button>
           <a class="btn btn-outline-info btn-sm" [routerLink]="['/patients', selectedPatient._id, 'chart']">Dental Chart</a>
         </div>
-        <hr>
-        <div><strong>Raw Data:</strong></div>
-        <pre>{{ selectedPatient | json }}</pre>
       </div>
   <div *ngIf="!selectedPatient && !isHome" class="text-muted">Select a patient to view details.</div>
     </div>

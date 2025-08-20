@@ -1,4 +1,5 @@
 const Patient = require('../models/Patient');
+const path = require('path');
 
 const getAllPatients = async (req, res) => {
   try {
@@ -24,7 +25,12 @@ const getPatientById = async (req, res) => {
 
 const addPatient = async (req, res) => {
   try {
-    const patient = new Patient(req.body);
+    const body = req.body || {};
+    if (req.file) {
+      // Store web-accessible path
+      body.profilePic = `/uploads/${req.file.filename}`;
+    }
+    const patient = new Patient(body);
     await patient.save();
     res.status(201).json(patient);
   } catch (error) {
@@ -35,7 +41,11 @@ const addPatient = async (req, res) => {
 const updatePatient = async (req, res) => {
   const { id } = req.params;
   try {
-    const patient = await Patient.findByIdAndUpdate(id, req.body, { new: true });
+    const update = { ...(req.body || {}) };
+    if (req.file) {
+      update.profilePic = `/uploads/${req.file.filename}`;
+    }
+    const patient = await Patient.findByIdAndUpdate(id, update, { new: true });
     if (!patient) { 
       return res.status(404).json({ message: 'Patient not found' });
     }

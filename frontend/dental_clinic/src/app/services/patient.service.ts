@@ -11,6 +11,7 @@ export interface Patient {
   address: string | { country?: string; city?: string; zip?: string; street?: string };
   gender: string;
   dentalChart?: any;
+  profilePic?: string;
 
 }
 
@@ -38,5 +39,36 @@ export class PatientService {
 
   createPatient(data: Partial<Patient>): Observable<Patient> {
     return this.http.post<Patient>(this.apiUrl, data);
+  }
+
+  // Multipart create with image
+  createPatientWithImage(data: Partial<Patient>, file: File): Observable<Patient> {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) {
+        if (typeof v === 'object') {
+          form.append(k, JSON.stringify(v));
+        } else {
+          form.append(k, String(v));
+        }
+      }
+    });
+    form.append('profilePic', file);
+    return this.http.post<Patient>(this.apiUrl, form);
+  }
+
+  updatePatientWithImage(id: string, data: Partial<Patient>, file: File): Observable<Patient> {
+    const form = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) {
+        if (typeof v === 'object') {
+          form.append(k, JSON.stringify(v));
+        } else {
+          form.append(k, String(v));
+        }
+      }
+    });
+    form.append('profilePic', file);
+    return this.http.patch<Patient>(`${this.apiUrl}/${id}`, form);
   }
 }
