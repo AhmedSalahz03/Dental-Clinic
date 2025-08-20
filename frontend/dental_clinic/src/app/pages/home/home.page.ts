@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule, JsonPipe, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { PatientsListComponent } from '../../components/patients-list/patients-list.component';
@@ -15,7 +15,7 @@ type NewPatientForm = Partial<Omit<Patient, 'address' | 'dateOfBirth'>> & { addr
 @Component({
 	selector: 'app-home',
 	standalone: true,
-					imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, PatientsListComponent, JsonPipe, DatePipe],
+					imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, PatientsListComponent, DatePipe],
 	templateUrl: './home.page.html',
 	styleUrls: ['./home.page.css']
 })
@@ -24,6 +24,10 @@ export class HomePage {
 	selectedPatient: Patient | null = null;
 	editingPatient: Patient | null = null;
 	isHome = true;
+	// Error messages for UI alerts
+	newPatientError: string | null = null;
+	editError: string | null = null;
+	deleteError: string | null = null;
 	// Ensure address is always present for template bindings
 	editForm: { address: AddressObj } & Partial<Omit<EditablePatient, 'address'>> = {
 		address: { country: '', city: '', zip: '', street: '' }
@@ -44,6 +48,13 @@ export class HomePage {
 		const now = new Date();
 		const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 		return local;
+	}
+
+	getImageUrl(url?: string | null): string {
+		if (!url) return '';
+		if (/^https?:\/\//i.test(url)) return url;
+		// Assume backend is on port 5000 in dev
+		return `http://localhost:5000${url}`;
 	}
 
 	constructor(
@@ -76,6 +87,9 @@ export class HomePage {
 			this.newPatientPreview = null;
 			this.editFile = null;
 			this.editPreview = null;
+			this.newPatientError = null;
+			this.editError = null;
+			this.deleteError = null;
 		this.isHome = true;
 		this.loadDashboard();
 	}
@@ -150,6 +164,7 @@ export class HomePage {
 				this.isHome = false;
 				this.newPatientFile = null;
 				this.newPatientPreview = null;
+				this.newPatientError = null;
 					this.newPatientForm = {
 						name: '',
 						email: '',
@@ -173,21 +188,29 @@ export class HomePage {
 			}
 
 			saveNewPatient() {
-				const payload: any = { ...this.newPatientForm };
+				const payload: any = this.normalizePayload({ ...this.newPatientForm });
+				const onError = (err: any) => {
+					console.error('Create patient failed:', err);
+					this.newPatientError = this.humanizeHttpError(err);
+				};
 				if (this.newPatientFile) {
-					this.patientService.createPatientWithImage(payload, this.newPatientFile).subscribe((created: Patient) => {
-						this.addingPatient = false;
-						this.selectedPatient = created;
-						this.refreshPatients();
-					});
-				} else {
-					this.patientService
-						.createPatient(payload)
-						.subscribe((created: Patient) => {
+					this.patientService.createPatientWithImage(payload, this.newPatientFile).subscribe({
+						next: (created: Patient) => {
 							this.addingPatient = false;
 							this.selectedPatient = created;
 							this.refreshPatients();
-						});
+						},
+						error: onError
+					});
+				} else {
+					this.patientService.createPatient(payload).subscribe({
+						next: (created: Patient) => {
+							this.addingPatient = false;
+							this.selectedPatient = created;
+							this.refreshPatients();
+						},
+						error: onError
+					});
 				}
 			}
 
@@ -208,7 +231,8 @@ export class HomePage {
 			return;
 		}
 		if (this.editFile) {
-			this.patientService.updatePatientWithImage(this.editingPatient._id, this.editForm, this.editFile).subscribe({
+			const normalized = this.normalizePayload({ ...this.editForm });
+			this.patientService.updatePatientWithImage(this.editingPatient._id, normalized, this.editFile).subscribe({
 				next: (updated) => {
 					console.log('Update success:', updated);
 					this.selectedPatient = updated;
@@ -219,11 +243,12 @@ export class HomePage {
 				},
 				error: (err) => {
 					console.error('Update failed:', err);
-					alert('Failed to save changes. Please check the console for details.');
+					this.editError = this.humanizeHttpError(err);
 				}
 			});
 		} else {
-			this.patientService.updatePatient(this.editingPatient._id, this.editForm).subscribe({
+			const normalized = this.normalizePayload({ ...this.editForm });
+			this.patientService.updatePatient(this.editingPatient._id, normalized).subscribe({
 			next: (updated) => {
 				console.log('Update success:', updated);
 				this.selectedPatient = updated;
@@ -232,7 +257,7 @@ export class HomePage {
 			},
 			error: (err) => {
 				console.error('Update failed:', err);
-				alert('Failed to save changes. Please check the console for details.');
+				this.editError = this.humanizeHttpError(err);
 			}
 			});
 		}
@@ -244,10 +269,16 @@ export class HomePage {
 
 	deletePatient(patient: Patient) {
 		if (!confirm('Are you sure you want to delete this patient?')) return;
-		this.patientService.deletePatient(patient._id).subscribe(() => {
-			this.selectedPatient = null;
-			this.editingPatient = null;
-			this.refreshPatients();
+		this.patientService.deletePatient(patient._id).subscribe({
+			next: () => {
+				this.selectedPatient = null;
+				this.editingPatient = null;
+				this.refreshPatients();
+			},
+			error: (err) => {
+				console.error('Delete failed:', err);
+				this.deleteError = this.humanizeHttpError(err);
+			}
 		});
 	}
 
@@ -273,5 +304,45 @@ export class HomePage {
 			};
 			reader.readAsDataURL(this.editFile);
 		}
+	}
+
+	private humanizeHttpError(err: any): string {
+		// Prefer backend message if present
+		const raw = err?.error;
+		const msg = (raw && (raw.message || raw.error || raw.msg)) || err?.message;
+		// Mongo duplicate key
+		if (raw && (raw.code === 11000 || /duplicate key/i.test(JSON.stringify(raw)))) {
+			return 'Email or phone already exists.';
+		}
+		if (err?.status === 400) {
+			return msg || 'Invalid data. Please check required fields.';
+		}
+		if (err?.status === 401) return 'Unauthorized. Please log in again.';
+		if (err?.status === 404) return 'Record not found.';
+		return msg || 'Something went wrong. Please try again.';
+	}
+
+	private normalizePayload<T extends Record<string, any>>(data: T): T {
+		// Trim strings and remove empty optional fields
+		const copy: any = { ...data };
+		for (const k of Object.keys(copy)) {
+			if (typeof copy[k] === 'string') {
+				copy[k] = copy[k].trim();
+				if (copy[k] === '') {
+					// Remove empty optional fields
+					if (['phone', 'profilePic'].includes(k)) delete copy[k];
+				}
+			}
+		}
+		if (copy.address && typeof copy.address === 'object') {
+			const a = { ...copy.address } as any;
+			['street', 'city', 'zip', 'country'].forEach(f => {
+				if (typeof a[f] === 'string') a[f] = a[f].trim();
+			});
+			const allEmpty = ['street', 'city', 'zip', 'country'].every(f => !a[f]);
+			copy.address = allEmpty ? undefined : a;
+			if (copy.address === undefined) delete copy.address;
+		}
+		return copy as T;
 	}
 }

@@ -7,3 +7,7 @@ frontend/.env
 frontend/node_modules/
 frontend/package-lock.json
 frontend/.vscode/
+backend_server/server/uploads/
+**/.DS_Store
+**/dist/
+**/.angular/

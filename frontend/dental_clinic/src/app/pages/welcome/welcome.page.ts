@@ -8,6 +8,12 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="container py-5 text-center">
+      <img
+        src="assets/d2165640-3c75-4e6b-8f77-e1c556223239_removalai_preview.png"
+        alt="Clinic Logo"
+        class="img-fluid mb-6"
+        style="max-width: 340px;"
+      />
       <h2 class="mb-4">Welcome</h2>
       <p class="text-muted mb-4">Please login or create an account to continue.</p>
       <div class="d-flex justify-content-center gap-3">

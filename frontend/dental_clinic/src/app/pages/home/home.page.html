@@ -75,6 +75,7 @@
     <div class="col-md-9 content" *ngIf="!isHome">
       <div *ngIf="addingPatient" class="card p-3 mb-3">
         <h4>Add New Patient</h4>
+  <div *ngIf="newPatientError" class="alert alert-danger py-2 mb-2">{{ newPatientError }}</div>
         <form #newPatientFormRef="ngForm" (ngSubmit)="saveNewPatient()" class="mb-2" novalidate>
           <div class="mb-2">
             <label for="name">Name:</label>
@@ -86,12 +87,18 @@
           </div>
           <div class="mb-2">
             <label for="email">Email:</label>
-            <input id="email" type="email" class="form-control" [(ngModel)]="newPatientForm.email" name="email" autocomplete="email" placeholder="john@example.com" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" #npEmail="ngModel" [class.is-invalid]="npEmail.invalid && (npEmail.dirty || npEmail.touched)" />
-            <div class="invalid-feedback d-block" *ngIf="npEmail.invalid && (npEmail.dirty || npEmail.touched)">Enter a valid email address.</div>
+            <input id="email" type="email" class="form-control" [(ngModel)]="newPatientForm.email" name="email" autocomplete="email" placeholder="john@example.com" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required #npEmail="ngModel" [class.is-invalid]="npEmail.invalid && (npEmail.dirty || npEmail.touched)" />
+            <div class="invalid-feedback d-block" *ngIf="npEmail.invalid && (npEmail.dirty || npEmail.touched)">
+              <span *ngIf="npEmail.errors?.['required']">Email is required.</span>
+              <span *ngIf="npEmail.errors?.['pattern'] || npEmail.errors?.['email']">Enter a valid email address.</span>
+            </div>
           </div>
           <div class="mb-2">
             <label for="bday">Date of Birth:</label>
-            <input id="bday" class="form-control" type="date" [(ngModel)]="newPatientForm.dateOfBirth" name="bday" autocomplete="bday" [attr.max]="todayDate" #npDob="ngModel" [class.is-invalid]="npDob.invalid && (npDob.dirty || npDob.touched)" />
+            <input id="bday" class="form-control" type="date" [(ngModel)]="newPatientForm.dateOfBirth" name="bday" autocomplete="bday" [attr.max]="todayDate" required #npDob="ngModel" [class.is-invalid]="npDob.invalid && (npDob.dirty || npDob.touched)" />
+            <div class="invalid-feedback d-block" *ngIf="npDob.invalid && (npDob.dirty || npDob.touched)">
+              <span *ngIf="npDob.errors?.['required']">Date of birth is required.</span>
+            </div>
           </div>
           <div class="mb-2">
             <label for="tel">Phone:</label>
@@ -124,7 +131,15 @@
           </div>
           <div class="mb-2">
             <label for="sex">Gender:</label>
-            <input id="sex" class="form-control" [(ngModel)]="newPatientForm.gender" name="sex" autocomplete="sex" placeholder="male/female" />
+            <select id="sex" class="form-select" [(ngModel)]="newPatientForm.gender" name="sex" required #npGender="ngModel" [class.is-invalid]="npGender.invalid && (npGender.dirty || npGender.touched)">
+              <option value="" disabled>Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="invalid-feedback d-block" *ngIf="npGender.invalid && (npGender.dirty || npGender.touched)">
+              <span *ngIf="npGender.errors?.['required']">Gender is required.</span>
+            </div>
           </div>
           <div class="mt-3 d-flex gap-2">
             <button class="btn btn-outline-primary btn-sm" type="button" (click)="fillSampleNewPatient()">Fill sample</button>
@@ -139,6 +154,7 @@
       </div>
       <div *ngIf="editingPatient" class="card p-3 mb-3">
         <h4>Edit Patient</h4>
+  <div *ngIf="editError" class="alert alert-danger py-2 mb-2">{{ editError }}</div>
         <form #editPatientFormRef="ngForm" (ngSubmit)="saveEdit()" class="mb-2" novalidate>
           <div class="mb-2">
             <label>Name:</label>
@@ -150,12 +166,18 @@
           </div>
           <div class="mb-2">
             <label>Email:</label>
-            <input class="form-control" type="email" [(ngModel)]="editForm.email" name="email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" #epEmail="ngModel" [class.is-invalid]="epEmail.invalid && (epEmail.dirty || epEmail.touched)" />
-            <div class="invalid-feedback d-block" *ngIf="epEmail.invalid && (epEmail.dirty || epEmail.touched)">Enter a valid email address.</div>
+            <input class="form-control" type="email" [(ngModel)]="editForm.email" name="email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required #epEmail="ngModel" [class.is-invalid]="epEmail.invalid && (epEmail.dirty || epEmail.touched)" />
+            <div class="invalid-feedback d-block" *ngIf="epEmail.invalid && (epEmail.dirty || epEmail.touched)">
+              <span *ngIf="epEmail.errors?.['required']">Email is required.</span>
+              <span *ngIf="epEmail.errors?.['pattern'] || epEmail.errors?.['email']">Enter a valid email address.</span>
+            </div>
           </div>
           <div class="mb-2">
             <label>Date of Birth:</label>
-            <input class="form-control" type="date" [(ngModel)]="editForm.dateOfBirth" name="dateOfBirth" [attr.max]="todayDate" #epDob="ngModel" [class.is-invalid]="epDob.invalid && (epDob.dirty || epDob.touched)" />
+            <input class="form-control" type="date" [(ngModel)]="editForm.dateOfBirth" name="dateOfBirth" [attr.max]="todayDate" required #epDob="ngModel" [class.is-invalid]="epDob.invalid && (epDob.dirty || epDob.touched)" />
+            <div class="invalid-feedback d-block" *ngIf="epDob.invalid && (epDob.dirty || epDob.touched)">
+              <span *ngIf="epDob.errors?.['required']">Date of birth is required.</span>
+            </div>
           </div>
           <div class="mb-2">
             <label>Phone:</label>
@@ -184,11 +206,19 @@
             <input class="form-control" type="file" accept="image/*" (change)="onEditProfilePicSelected($event)" />
           </div>
           <div class="mb-2 d-flex align-items-center gap-3" *ngIf="selectedPatient?.profilePic || editPreview">
-            <img [src]="editPreview || selectedPatient?.profilePic" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
+            <img [src]="editPreview || getImageUrl(selectedPatient?.profilePic)" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
           </div>
           <div class="mb-2">
             <label>Gender:</label>
-            <input class="form-control" [(ngModel)]="editForm.gender" name="gender" />
+            <select class="form-select" [(ngModel)]="editForm.gender" name="gender" required #epGender="ngModel" [class.is-invalid]="epGender.invalid && (epGender.dirty || epGender.touched)">
+              <option value="" disabled>Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="invalid-feedback d-block" *ngIf="epGender.invalid && (epGender.dirty || epGender.touched)">
+              <span *ngIf="epGender.errors?.['required']">Gender is required.</span>
+            </div>
           </div>
           <div class="mt-3 d-flex gap-2">
             <button class="btn btn-success btn-sm" type="submit" [disabled]="editPatientFormRef.invalid">Save</button>
@@ -198,7 +228,7 @@
       </div>
       <div *ngIf="selectedPatient && !editingPatient" class="card p-3 mb-3">
         <div class="mb-3 d-flex align-items-center gap-3" *ngIf="selectedPatient.profilePic">
-          <img [src]="selectedPatient.profilePic" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
+          <img [src]="getImageUrl(selectedPatient.profilePic)" alt="Profile" class="img-thumbnail" style="max-width: 120px; height: auto;" />
           <div class="fs-5 fw-semibold">{{ selectedPatient.name || 'N/A' }}</div>
         </div>
         <div class="mb-2"><strong>Name:</strong> {{ selectedPatient.name || 'N/A' }}</div>

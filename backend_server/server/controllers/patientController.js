@@ -26,6 +26,12 @@ const getPatientById = async (req, res) => {
 const addPatient = async (req, res) => {
   try {
     const body = req.body || {};
+    // Parse known JSON fields if sent as strings from multipart forms
+    for (const key of ['address', 'dentalChart']) {
+      if (typeof body[key] === 'string') {
+        try { body[key] = JSON.parse(body[key]); } catch { /* ignore */ }
+      }
+    }
     if (req.file) {
       // Store web-accessible path
       body.profilePic = `/uploads/${req.file.filename}`;
@@ -42,6 +48,11 @@ const updatePatient = async (req, res) => {
   const { id } = req.params;
   try {
     const update = { ...(req.body || {}) };
+    for (const key of ['address', 'dentalChart']) {
+      if (typeof update[key] === 'string') {
+        try { update[key] = JSON.parse(update[key]); } catch { /* ignore */ }
+      }
+    }
     if (req.file) {
       update.profilePic = `/uploads/${req.file.filename}`;
     }
